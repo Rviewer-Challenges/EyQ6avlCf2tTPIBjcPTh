@@ -1,7 +1,12 @@
+import org.jooq.meta.jaxb.Logging
+import nu.studer.gradle.jooq.JooqEdition
+
 plugins {
-	id 'org.springframework.boot' version '2.7.3'
-	id 'io.spring.dependency-management' version '1.0.13.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.7.3'
+    id 'io.spring.dependency-management' version '1.0.13.RELEASE'
+    id 'nu.studer.jooq' version '7.1.1'
+    id "org.flywaydb.flyway" version "9.3.0"
+    id 'java'
 }
 
 group = 'com.rebirth'
@@ -9,26 +14,104 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
-	implementation 'org.springframework.boot:spring-boot-starter-freemarker'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    implementation 'org.jetbrains:annotations:23.0.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.1'
+    implementation 'org.mapstruct:mapstruct:1.5.2.Final'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.2.Final'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    jooqGenerator 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0'
+    jooqGenerator 'org.postgresql:postgresql:42.3.2'
 }
 
+
+flyway {
+    driver = 'org.postgresql.Driver'
+    url = 'jdbc:postgresql://localhost:15432/postgres'
+    user = 'postgres'
+    password = 'h4sk3ll'
+    connectRetries = 10
+    createSchemas = false
+    cleanDisabled = false
+    schemas = ['flyway_history_schema']
+    placeholderPrefix = '#['
+    placeholderSuffix = ']'
+    placeholders = [
+            'app_schema': 'app'
+    ]
+}
+
+jooq {
+    version = '3.14.16'
+    edition = JooqEdition.OSS  // the default (can be omitted)
+    configurations {
+        main {  // name of the jOOQ configuration
+            generateSchemaSourceOnCompilation = false  // default (can be omitted)
+
+            generationTool {
+                logging = Logging.WARN
+                jdbc {
+                    driver = 'org.postgresql.Driver'
+                    url = 'jdbc:postgresql://localhost:15432/postgres'
+                    user = 'postgres'
+                    password = 'h4sk3ll'
+                }
+                generator {
+                    name = 'org.jooq.codegen.DefaultGenerator'
+                    database {
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        inputSchema = 'app'
+                        forcedTypes {
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'JSONB?'
+                            }
+                            forcedType {
+                                name = 'varchar'
+                                includeExpression = '.*'
+                                includeTypes = 'INET'
+                            }
+                        }
+                    }
+                    generate {
+                        validationAnnotations = true
+                        springAnnotations = true
+                        fluentSetters = true
+                        javaTimeTypes = true
+                        generatedSerialVersionUID = 'HASH'
+                        daos = true
+                    }
+                    target {
+                        packageName = 'com.rebirth.mycode.domain'
+                    }
+                    strategy.name = 'org.jooq.codegen.DefaultGeneratorStrategy'
+                }
+            }
+        }
+    }
+}
+
+
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

@@ -1,0 +1,1 @@
+ALTER TYPE #[app_schema].proglang_version_upsert ADD ATTRIBUTE programming_language_uid uuid;

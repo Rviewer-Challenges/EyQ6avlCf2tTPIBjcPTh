@@ -1,0 +1,1 @@
+alter table #[app_schema].programming_language alter column programming_language_name type varchar(30);
