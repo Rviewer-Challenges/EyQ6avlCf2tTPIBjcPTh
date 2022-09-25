@@ -50,29 +50,29 @@ public class ProgrammingLanguageController extends BaseController {
     }
 
     @GetMapping("/{uuid}")
-    public ResponseEntity<ProgrammingLanguageSecure> getLanguage(@PathVariable("uuid") String uuid) {
-        ProgrammingLanguageSecure programmingLanguage = this.programmingLanguageService.findById(UUID.fromString(uuid));
+    public ResponseEntity<ProgrammingLanguageSecure> getLanguage(@PathVariable("uuid") UUID uuid) {
+        ProgrammingLanguageSecure programmingLanguage = this.programmingLanguageService.findById(uuid);
         return ResponseEntity.ok(programmingLanguage);
     }
 
     @GetMapping("/{uuid}/versions")
-    public ResponseEntity<List<ProglangVersionSecure>> getVersionsFromLanguage(@PathVariable("uuid") String uuid) {
-        List<ProglangVersionSecure> programmingLanguage = this.progLangVersionService.findByLanguage(UUID.fromString(uuid));
+    public ResponseEntity<List<ProglangVersionSecure>> getVersionsFromLanguage(@PathVariable("uuid") UUID uuid) {
+        List<ProglangVersionSecure> programmingLanguage = this.progLangVersionService.findByLanguage(uuid);
         return ResponseEntity.ok(programmingLanguage);
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<ProgrammingLanguageSecure> putLanguage(@PathVariable("uuid") String uuid,
+    public ResponseEntity<ProgrammingLanguageSecure> putLanguage(@PathVariable("uuid") UUID uuid,
                                                                  @RequestBody @Valid ProgrammingLanguageUpsertWithValidation programmingLanguage,
                                                                  Errors errors) {
         this.validateDto("ProgrammingLanguage", errors);
-        ProgrammingLanguageSecure programmingLanguageUpdated = this.programmingLanguageService.update(programmingLanguage, UUID.fromString(uuid));
+        ProgrammingLanguageSecure programmingLanguageUpdated = this.programmingLanguageService.update(programmingLanguage, uuid);
         return ResponseEntity.ok(programmingLanguageUpdated);
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<?> deleteLanguage(@PathVariable("uuid") String uuid) {
-        this.programmingLanguageService.delete(UUID.fromString(uuid));
+    public ResponseEntity<?> deleteLanguage(@PathVariable("uuid") UUID uuid) {
+        this.programmingLanguageService.delete(uuid);
         return ResponseEntity
                 .noContent()
                 .build();

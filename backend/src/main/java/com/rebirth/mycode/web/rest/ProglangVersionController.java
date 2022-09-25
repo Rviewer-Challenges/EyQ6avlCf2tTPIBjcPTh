@@ -22,29 +22,6 @@ public class ProglangVersionController extends BaseController {
         this.progLangVersionService = progLangVersionService;
     }
 
-    @GetMapping("/{uuid}")
-    public ResponseEntity<ProglangVersionSecure> getProgLangVersion(@PathVariable("uuid") String uuid) {
-        ProglangVersionSecure programmingLanguage = progLangVersionService.findById(UUID.fromString(uuid));
-        return ResponseEntity.ok(programmingLanguage);
-    }
-
-    @PutMapping("/{uuid}")
-    public ResponseEntity<ProglangVersionSecure> putProgLangVersion(@PathVariable("uuid") String uuid,
-                                                                    @RequestBody @Valid ProglangVersionUpsertWithValidation proglangVersionUpsert,
-                                                                    Errors errors) {
-        validateDto("ProgrammingLanguage", errors);
-        ProglangVersionSecure proglangVersionSecure = progLangVersionService.update(proglangVersionUpsert, UUID.fromString(uuid));
-        return ResponseEntity.ok(proglangVersionSecure);
-    }
-
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<?> deleteProgLangVersion(@PathVariable("uuid") String uuid) {
-        progLangVersionService.delete(UUID.fromString(uuid));
-        return ResponseEntity
-                .noContent()
-                .build();
-    }
-
     @GetMapping
     public ResponseEntity<List<ProglangVersionSecure>> getProgLangVersion() {
         List<ProglangVersionSecure> programmingLanguages = progLangVersionService.findAll();
@@ -62,4 +39,29 @@ public class ProglangVersionController extends BaseController {
         return ResponseEntity.created(uriFromCreatedEntity)
                 .body(newProglangVersionSecure);
     }
+
+    @GetMapping("/{uuid}")
+    public ResponseEntity<ProglangVersionSecure> getProgLangVersion(@PathVariable("uuid") UUID uuid) {
+        ProglangVersionSecure programmingLanguage = progLangVersionService.findById(uuid);
+        return ResponseEntity.ok(programmingLanguage);
+    }
+
+    @PutMapping("/{uuid}")
+    public ResponseEntity<ProglangVersionSecure> putProgLangVersion(@PathVariable("uuid") UUID uuid,
+                                                                    @RequestBody @Valid ProglangVersionUpsertWithValidation proglangVersionUpsert,
+                                                                    Errors errors) {
+        validateDto("ProgrammingLanguage", errors);
+        ProglangVersionSecure proglangVersionSecure = progLangVersionService.update(proglangVersionUpsert, uuid);
+        return ResponseEntity.ok(proglangVersionSecure);
+    }
+
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<?> deleteProgLangVersion(@PathVariable("uuid") UUID uuid) {
+        progLangVersionService.delete(uuid);
+        return ResponseEntity
+                .noContent()
+                .build();
+    }
+
+
 }

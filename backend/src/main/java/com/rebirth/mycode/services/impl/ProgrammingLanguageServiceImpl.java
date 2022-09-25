@@ -69,7 +69,7 @@ public class ProgrammingLanguageServiceImpl implements ProgrammingLanguageServic
         try {
             ProgrammingLanguage programmingLanguageInPersistence = this.findByUUIDRaw(uuid);
 
-            this.mapper.programmingLanguageDtoToProgrammingLanguage(object, programmingLanguageInPersistence);
+            this.mapper.updateProgrammingLanguage(object, programmingLanguageInPersistence);
             this.programmingLanguageDao.update(programmingLanguageInPersistence);
             return this.mapper.programmingLanguage2ProgrammingLanguageSecure(programmingLanguageInPersistence);
 

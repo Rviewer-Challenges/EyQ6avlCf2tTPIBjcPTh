@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 @Mapper(
         componentModel = MappingConstants.ComponentModel.SPRING,
         injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-        imports = {LocalDateTime.class},
-        uses = {}
+        imports = {LocalDateTime.class}
 )
 public interface ProgrammingLanguageMapper {
 
@@ -38,7 +37,7 @@ public interface ProgrammingLanguageMapper {
     @Mapping(target = "version", expression = "java(programmingLanguage.getVersion() == null ? 1 : programmingLanguage.getVersion() + 1)")
     @Mapping(target = "modifyAt", expression = "java(LocalDateTime.now())")
     @Mapping(target = "modifyBy", constant = "SYSTEM")
-    void programmingLanguageDtoToProgrammingLanguage(
+    void updateProgrammingLanguage(
             ProgrammingLanguageUpsert programmingLanguageUpsert,
             @MappingTarget ProgrammingLanguage programmingLanguage
     );
