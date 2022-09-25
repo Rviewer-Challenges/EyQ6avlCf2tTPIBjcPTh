@@ -1,0 +1,10 @@
+SnippetCode
+    insert
+    delete
+    update
+
+Agregar llave foranea directamente en la tabla de snippetcode del lenguaje de programacion que se esta usando,
+    esto para obtener mas facil el lenguaje de programacion en dado caso que se necesite.
+
+comprimir migraciones de la base de datos.
+

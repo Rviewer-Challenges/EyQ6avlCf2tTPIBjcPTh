@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.rebirth.mycode.domain.Routines;
 import com.rebirth.mycode.domain.routines.FetchPageSnippetCodeSecure;
 import com.rebirth.mycode.domain.routines.FetchSnippetCodeSecureJooqadapt;
+import com.rebirth.mycode.domain.routines.InsertSnippetcode;
 import com.rebirth.mycode.domain.udt.pojos.SnippetCodePage;
 import com.rebirth.mycode.domain.udt.pojos.SnippetCodeSecure;
 import com.rebirth.mycode.domain.udt.pojos.SnippetCodeUpsert;
@@ -47,7 +48,16 @@ public class SnippetCodeServiceImpl implements SnippetCodeService {
 
     @Override
     public SnippetCodeSecure insert(SnippetCodeUpsert object) {
-        return null;
+        InsertSnippetcode newSnippetcode = Routines.insertSnippetcode(this.configuration, "SYSTEM", object.getTitle(), object.getDescription(), object.getCode(), object.getProglangVersionUid(), object.getTagsUuids());
+        return new SnippetCodeSecure()
+                .setSnippetCodeUid(newSnippetcode.getCodeUidOut())
+                .setTitle(newSnippetcode.getTitleOut())
+                .setDescription(newSnippetcode.getDescriptionOut())
+                .setCode(newSnippetcode.getCodeOut())
+                .setLanguageName(newSnippetcode.getLanguageNameOut())
+                .setLangVersion(newSnippetcode.getLangVersionOut())
+                .setTags(newSnippetcode.getTagsOut())
+                .setCreateAt(newSnippetcode.getCreateAtOut());
     }
 
     @Override
