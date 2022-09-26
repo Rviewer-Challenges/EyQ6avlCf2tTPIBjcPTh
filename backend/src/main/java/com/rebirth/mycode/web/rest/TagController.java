@@ -6,6 +6,7 @@ import com.rebirth.mycode.domain.udt.pojos.TagSecure;
 import com.rebirth.mycode.domain.udt.pojos.TagUpsert;
 import com.rebirth.mycode.services.TagService;
 import com.rebirth.mycode.web.dto.ProgrammingLanguageUpsertWithValidation;
+import com.rebirth.mycode.web.dto.TagUpsertWithValidation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +33,9 @@ public class TagController extends BaseController {
     }
 
     @PostMapping
-    public ResponseEntity<TagSecure> postTag(@RequestBody @Valid TagUpsert programmingLanguage, Errors errors) {
+    public ResponseEntity<TagSecure> postTag(@RequestBody @Valid TagUpsertWithValidation tagUpsert, Errors errors) {
         this.validateDto("Tag", errors);
-        TagSecure tagSecure = this.tagService.insert(programmingLanguage);
+        TagSecure tagSecure = this.tagService.insert(tagUpsert);
         UUID tagUid = tagSecure.getTagUid();
         URI uriFromCreatedEntity = this.createUri4newEntity(tagUid);
         return ResponseEntity.created(uriFromCreatedEntity)
@@ -49,8 +50,8 @@ public class TagController extends BaseController {
 
     @PutMapping("/{uuid}")
     public ResponseEntity<TagSecure> putTag(@PathVariable("uuid") UUID uuid,
-                                                 @RequestBody @Valid TagUpsert tagUpsert,
-                                                 Errors errors) {
+                                            @RequestBody @Valid TagUpsert tagUpsert,
+                                            Errors errors) {
         this.validateDto("Tag", errors);
         TagSecure tagSecure = this.tagService.update(tagUpsert, uuid);
         return ResponseEntity.ok(tagSecure);

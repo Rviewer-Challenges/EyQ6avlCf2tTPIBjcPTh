@@ -1,6 +1,7 @@
 package com.rebirth.mycode.web.rest;
 
 import com.rebirth.mycode.domain.udt.pojos.ProglangVersionSecure;
+import com.rebirth.mycode.domain.udt.pojos.ProglangVersionUpsert;
 import com.rebirth.mycode.services.ProgLangVersionService;
 import com.rebirth.mycode.web.dto.ProglangVersionUpsertWithValidation;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class ProglangVersionController extends BaseController {
 
     @PutMapping("/{uuid}")
     public ResponseEntity<ProglangVersionSecure> putProgLangVersion(@PathVariable("uuid") UUID uuid,
-                                                                    @RequestBody @Valid ProglangVersionUpsertWithValidation proglangVersionUpsert,
+                                                                    @RequestBody @Valid ProglangVersionUpsert proglangVersionUpsert,
                                                                     Errors errors) {
         validateDto("ProgrammingLanguage", errors);
         ProglangVersionSecure proglangVersionSecure = progLangVersionService.update(proglangVersionUpsert, uuid);

@@ -1,11 +1,11 @@
-CREATE OR REPLACE FUNCTION #[app_schema].insert_snippetcode(
-    create_by_in varchar,
-	title_in varchar(100),
+CREATE OR REPLACE FUNCTION #[app_schema].upsert_snippetcode(
+    snippet_code_uid_in uuid,
+    modify_by_in varchar,
 	description_in varchar(300),
 	code_in text,
 	proglang_version_uid_in uuid,
 	tags_uuids uuid[],
-
+--Outputs
     out code_uid_out uuid,
     out title_out varchar(100),
     out description_out varchar(300),
@@ -19,44 +19,61 @@ CREATE OR REPLACE FUNCTION #[app_schema].insert_snippetcode(
  LANGUAGE plpgsql
 AS $function$
 declare
-	_new_tag_uuid uuid = uuid_generate_v4();
+    _snippetcode #[app_schema].snippet_code%ROWTYPE;
 	_current_timestamp timestamp = CURRENT_TIMESTAMP;
 	_language_uid uuid;
 	_tag_uid uuid;
-	_tag_names varchar[] = '{}';
-	_tag_name varchar = '';
 	BEGIN
-        INSERT INTO #[app_schema].snippet_code(create_by, modify_by, create_at, modify_at, "version", is_enable, snippet_code_uid, code, description, title, proglang_version_uid)
-        VALUES(create_by_in, create_by_in, _current_timestamp, _current_timestamp, 1, true, _new_tag_uuid, code_in, description_in, title_in, proglang_version_uid_in)
-        RETURNING snippet_code_uid,
-            title,
-            description,
-            code,
-            create_at
-        INTO code_uid_out,
-            title_out,
-            description_out,
-            code_out,
-            create_at_out;
+
+        SELECT * INTO _snippetcode FROM #[app_schema].snippet_code WHERE snippet_code_uid=snippet_code_uid_in;
+	    IF FOUND THEN
+
+            DELETE FROM #[app_schema].snippet_code_tag
+            WHERE snippet_code_uid=_snippetcode.snippet_code_uid;
+
+            UPDATE #[app_schema].snippet_code
+            SET modify_by=modify_by_in,
+                modify_at=_current_timestamp,
+                "version"=_snippetcode.version + 1,
+                is_enable=true,
+                code=COALESCE(code_in, _snippetcode.code),
+                description=COALESCE(description_in, _snippetcode.description),
+                proglang_version_uid=COALESCE(proglang_version_uid_in, _snippetcode.proglang_version_uid)
+            WHERE snippet_code_uid=_snippetcode.snippet_code_uid;
+
+            SELECT * INTO _snippetcode FROM #[app_schema].snippet_code WHERE snippet_code_uid=snippet_code_uid_in;
+
+            code_uid_out=_snippetcode.snippet_code_uid;
+            title_out=_snippetcode.title;
+            description_out=_snippetcode.description;
+            code_out=_snippetcode.code;
+            create_at_out=_snippetcode.create_at;
+
+        ELSE
+            INSERT INTO #[app_schema].snippet_code(create_by, modify_by, create_at, modify_at, "version", is_enable, snippet_code_uid, code, description, title, proglang_version_uid)
+            VALUES(modify_by_in, modify_by_in, _current_timestamp, _current_timestamp, 1, true, snippet_code_uid_in, code_in, description_in, title_in, proglang_version_uid_in)
+            RETURNING * INTO _snippetcode;
+	    END IF;
 
         SELECT version_code, programming_language_uid into lang_version_out, _language_uid
         FROM #[app_schema].proglang_version pv0
-        WHERE pv0.proglang_version_uid = proglang_version_uid_in;
+        WHERE pv0.proglang_version_uid = _snippetcode.proglang_version_uid;
 
         SELECT programming_language_name into language_name_out
         FROM #[app_schema].programming_language pl0
         WHERE pl0.programming_language_uid = _language_uid;
 
-        FOREACH _tag_uid IN ARRAY tags_uuids
-        LOOP
-            INSERT INTO #[app_schema].snippet_code_tag(snippet_code_uid, tag_uid)
-                VALUES(_new_tag_uuid, _tag_uid);
-        END LOOP;
+        if tags_uuids is not null then
+            FOREACH _tag_uid IN ARRAY tags_uuids
+            LOOP
+                INSERT INTO #[app_schema].snippet_code_tag(snippet_code_uid, tag_uid)
+                    VALUES(snippet_code_uid_in, _tag_uid);
+            END LOOP;
 
-        SELECT array_agg(t.tag_name) INTO tags_out
-        FROM #[app_schema].tag t
-        WHERE t.tag_uid = ANY(tags_uuids);
-
+            SELECT array_agg(t.tag_name) INTO tags_out
+            FROM #[app_schema].tag t
+            WHERE t.tag_uid = ANY(tags_uuids);
+        end if;
     END;
 $function$
 ;

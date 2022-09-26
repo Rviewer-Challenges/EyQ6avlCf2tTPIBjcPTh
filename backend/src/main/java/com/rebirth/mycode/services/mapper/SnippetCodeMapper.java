@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rebirth.mycode.domain.routines.FetchPageSnippetCodeSecure;
 import com.rebirth.mycode.domain.routines.FetchSnippetCodeSecureJooqadapt;
+import com.rebirth.mycode.domain.routines.InsertSnippetcode;
+import com.rebirth.mycode.domain.routines.UpsertSnippetcode;
 import com.rebirth.mycode.domain.udt.pojos.SnippetCodePage;
 import com.rebirth.mycode.domain.udt.pojos.SnippetCodeSecure;
 import org.mapstruct.InjectionStrategy;
@@ -29,6 +31,27 @@ public abstract class SnippetCodeMapper {
 
 
     public abstract SnippetCodeSecure fetchSnippetCodeSecureJooqadapt2SnippetCodePage(FetchSnippetCodeSecureJooqadapt fetchSnippetCodeSecureJooqadapt);
+
+    @Mapping(source = "codeUidOut", target = "snippetCodeUid")
+    @Mapping(source = "titleOut", target = "title")
+    @Mapping(source = "descriptionOut", target = "description")
+    @Mapping(source = "codeOut", target = "code")
+    @Mapping(source = "languageNameOut", target = "languageName")
+    @Mapping(source = "langVersionOut", target = "langVersion")
+    @Mapping(source = "tagsOut", target = "tags")
+    @Mapping(source = "createAtOut", target = "createAt")
+    public abstract SnippetCodeSecure insertSnippetcodeToSnippetCodeSecure(InsertSnippetcode insertSnippetcode);
+
+
+    @Mapping(source = "codeUidOut", target = "snippetCodeUid")
+    @Mapping(source = "titleOut", target = "title")
+    @Mapping(source = "descriptionOut", target = "description")
+    @Mapping(source = "codeOut", target = "code")
+    @Mapping(source = "languageNameOut", target = "languageName")
+    @Mapping(source = "langVersionOut", target = "langVersion")
+    @Mapping(source = "tagsOut", target = "tags")
+    @Mapping(source = "createAtOut", target = "createAt")
+    public abstract SnippetCodeSecure upsertSnippetcodeToSnippetCodeSecure(UpsertSnippetcode upsertSnippetcode);
 
 
 }

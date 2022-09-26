@@ -2,6 +2,7 @@ package com.rebirth.mycode.web.rest;
 
 import com.rebirth.mycode.domain.udt.pojos.ProglangVersionSecure;
 import com.rebirth.mycode.domain.udt.pojos.ProgrammingLanguageSecure;
+import com.rebirth.mycode.domain.udt.pojos.ProgrammingLanguageUpsert;
 import com.rebirth.mycode.services.ProgLangVersionService;
 import com.rebirth.mycode.services.ProgrammingLanguageService;
 import com.rebirth.mycode.web.dto.ProgrammingLanguageUpsertWithValidation;
@@ -63,7 +64,7 @@ public class ProgrammingLanguageController extends BaseController {
 
     @PutMapping("/{uuid}")
     public ResponseEntity<ProgrammingLanguageSecure> putLanguage(@PathVariable("uuid") UUID uuid,
-                                                                 @RequestBody @Valid ProgrammingLanguageUpsertWithValidation programmingLanguage,
+                                                                 @RequestBody @Valid ProgrammingLanguageUpsert programmingLanguage,
                                                                  Errors errors) {
         this.validateDto("ProgrammingLanguage", errors);
         ProgrammingLanguageSecure programmingLanguageUpdated = this.programmingLanguageService.update(programmingLanguage, uuid);
