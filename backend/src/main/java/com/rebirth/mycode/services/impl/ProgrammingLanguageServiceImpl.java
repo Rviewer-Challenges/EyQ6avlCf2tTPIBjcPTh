@@ -111,4 +111,9 @@ public class ProgrammingLanguageServiceImpl implements ProgrammingLanguageServic
         }
     }
 
+    @Override
+    public ProgrammingLanguageSecure fetchByName(String name) {
+        ProgrammingLanguage programmingLanguage = this.programmingLanguageDao.fetchOneByProgrammingLanguageName(name);
+        return this.mapper.programmingLanguage2ProgrammingLanguageSecure(programmingLanguage);
+    }
 }

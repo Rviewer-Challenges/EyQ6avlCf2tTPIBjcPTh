@@ -38,7 +38,7 @@ declare
 					limit page_size offset ( page_number * page_size)
 		loop
 			elemento = #[app_schema].fetch_snippet_code_secure(snippet_code_uid);
-			contenido = contenido || elemento;
+			contenido = array_append(contenido, elemento);
 		end loop;
 		payload = to_json(contenido);
     END;

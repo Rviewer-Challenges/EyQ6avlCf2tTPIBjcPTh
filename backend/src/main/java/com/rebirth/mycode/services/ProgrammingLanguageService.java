@@ -13,4 +13,6 @@ public interface ProgrammingLanguageService
         String CACHE_KEY = "programmingLanguage";
     }
 
+    ProgrammingLanguageSecure fetchByName(String name);
+
 }

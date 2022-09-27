@@ -1,6 +1,8 @@
 package com.rebirth.mycode.configuration;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
@@ -13,13 +15,22 @@ import java.util.concurrent.TimeUnit;
 @EnableCaching
 public class CacheConfiguration {
 
+    private static final Logger LOG = LoggerFactory.getLogger(CacheConfiguration.class);
+
     @Bean
     public Caffeine<Object, Object> caffeineConfig() {
         return Caffeine.newBuilder()
                 .removalListener((key, value, cause) -> {
-                    System.out.println("KEY:" + key);
-                    System.out.println("VALUE:" + value);
-                    System.out.println("CAUSE:" + cause.name());
+                    LOG.info("Removal");
+                    LOG.info("KEY: {}", key);
+                    LOG.info("VALUE: {}", value);
+                    LOG.info("CAUSE: {}", cause);
+                })
+                .evictionListener((key, value, cause) -> {
+                    LOG.info("Evict");
+                    LOG.info("KEY: {}", key);
+                    LOG.info("VALUE: {}", value);
+                    LOG.info("CAUSE: {}", cause);
                 })
                 .expireAfterWrite(15, TimeUnit.MINUTES);
     }

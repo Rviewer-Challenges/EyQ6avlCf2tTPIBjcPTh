@@ -1,13 +1,11 @@
-
-
-alter table #[app_schema].snippet_code drop column if exists rating;
-
 CREATE TYPE #[app_schema].snippet_code_upsert
     AS (
         title varchar(100),
         description varchar(300),
         code text,
-        proglang_version_uid uuid
+        proglang_uid uuid,
+        proglang_version_uid uuid,
+        tags_uuids uuid[]
     );
 
 CREATE TYPE #[app_schema].snippet_code_secure

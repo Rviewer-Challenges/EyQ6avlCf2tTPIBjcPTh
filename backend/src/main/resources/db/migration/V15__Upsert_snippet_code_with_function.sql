@@ -3,6 +3,7 @@ CREATE OR REPLACE FUNCTION #[app_schema].upsert_snippetcode(
     modify_by_in varchar,
 	description_in varchar(300),
 	code_in text,
+	proglang_uid_in uuid,
 	proglang_version_uid_in uuid,
 	tags_uuids uuid[],
 --Outputs
@@ -38,6 +39,7 @@ declare
                 is_enable=true,
                 code=COALESCE(code_in, _snippetcode.code),
                 description=COALESCE(description_in, _snippetcode.description),
+                proglang_uid=COALESCE(proglang_uid_in, _snippetcode.proglang_uid),
                 proglang_version_uid=COALESCE(proglang_version_uid_in, _snippetcode.proglang_version_uid)
             WHERE snippet_code_uid=_snippetcode.snippet_code_uid;
 
@@ -50,18 +52,19 @@ declare
             create_at_out=_snippetcode.create_at;
 
         ELSE
-            INSERT INTO #[app_schema].snippet_code(create_by, modify_by, create_at, modify_at, "version", is_enable, snippet_code_uid, code, description, title, proglang_version_uid)
-            VALUES(modify_by_in, modify_by_in, _current_timestamp, _current_timestamp, 1, true, snippet_code_uid_in, code_in, description_in, title_in, proglang_version_uid_in)
+            INSERT INTO #[app_schema].snippet_code(create_by, modify_by, create_at, modify_at, "version", is_enable, snippet_code_uid, code, description, title, proglang_uid, proglang_version_uid)
+            VALUES(modify_by_in, modify_by_in, _current_timestamp, _current_timestamp, 1, true, snippet_code_uid_in, code_in, description_in, title_in, proglang_uid_in, proglang_version_uid_in)
             RETURNING * INTO _snippetcode;
 	    END IF;
 
-        SELECT version_code, programming_language_uid into lang_version_out, _language_uid
-        FROM #[app_schema].proglang_version pv0
-        WHERE pv0.proglang_version_uid = _snippetcode.proglang_version_uid;
+        select pl1.programming_language_name into language_name_out
+            from #[app_schema].programming_language pl1
+            where pl1.language_uid = proglang_uid_in;
 
-        SELECT programming_language_name into language_name_out
-        FROM #[app_schema].programming_language pl0
-        WHERE pl0.programming_language_uid = _language_uid;
+        select pv1.version_code into lang_version_out
+            from #[app_schema].proglang_version pv1
+            where pv1.proglang_version_uid = proglang_version_uid_in;
+
 
         if tags_uuids is not null then
             FOREACH _tag_uid IN ARRAY tags_uuids

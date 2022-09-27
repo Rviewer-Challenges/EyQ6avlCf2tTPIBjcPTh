@@ -3,9 +3,10 @@ CREATE OR REPLACE FUNCTION #[app_schema].insert_snippetcode(
 	title_in varchar(100),
 	description_in varchar(300),
 	code_in text,
+	proglang_uid_in uuid,
 	proglang_version_uid_in uuid,
 	tags_uuids uuid[],
-
+    --Outputs
     out code_uid_out uuid,
     out title_out varchar(100),
     out description_out varchar(300),
@@ -24,8 +25,8 @@ declare
 	_language_uid uuid;
 	_tag_uid uuid;
 	BEGIN
-        INSERT INTO #[app_schema].snippet_code(create_by, modify_by, create_at, modify_at, "version", is_enable, snippet_code_uid, code, description, title, proglang_version_uid)
-        VALUES(create_by_in, create_by_in, _current_timestamp, _current_timestamp, 1, true, _new_tag_uuid, code_in, description_in, title_in, proglang_version_uid_in)
+        INSERT INTO #[app_schema].snippet_code(create_by, modify_by, create_at, modify_at, "version", is_enable, snippet_code_uid, code, description, title, proglang_uid, proglang_version_uid)
+        VALUES(create_by_in, create_by_in, _current_timestamp, _current_timestamp, 1, true, _new_tag_uuid, code_in, description_in, title_in, proglang_uid_in, proglang_version_uid_in)
         RETURNING snippet_code_uid,
             title,
             description,
@@ -37,13 +38,13 @@ declare
             code_out,
             create_at_out;
 
-        SELECT version_code, programming_language_uid into lang_version_out, _language_uid
-        FROM #[app_schema].proglang_version pv0
-        WHERE pv0.proglang_version_uid = proglang_version_uid_in;
+        select pl1.programming_language_name into language_name_out
+            from #[app_schema].programming_language pl1
+            where pl1.language_uid = proglang_uid_in;
 
-        SELECT programming_language_name into language_name_out
-        FROM #[app_schema].programming_language pl0
-        WHERE pl0.programming_language_uid = _language_uid;
+        select pv1.version_code into lang_version_out
+            from #[app_schema].proglang_version pv1
+            where pv1.proglang_version_uid = proglang_version_uid_in;
 
         if tags_uuids is not null then
             FOREACH _tag_uid IN ARRAY tags_uuids

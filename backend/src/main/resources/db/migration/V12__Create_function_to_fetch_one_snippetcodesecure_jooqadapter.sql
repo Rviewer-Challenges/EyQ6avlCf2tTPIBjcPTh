@@ -1,5 +1,6 @@
 CREATE OR REPLACE FUNCTION #[app_schema].fetch_snippet_code_secure_jooqadapt(
     snippetcode_uid_in uuid,
+    --Outputs
     out snippet_code_uid uuid,
     out title varchar(100),
     out description varchar(300),

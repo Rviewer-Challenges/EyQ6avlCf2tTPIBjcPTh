@@ -9,6 +9,12 @@ plugins {
     id 'java'
 }
 
+ext{
+    dbusername = 'mycode'
+    dbpassword = '1234'
+}
+
+
 group = 'com.rebirth'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
@@ -60,9 +66,9 @@ tasks.named('test') {
 
 flyway {
     driver = 'org.postgresql.Driver'
-    url = 'jdbc:postgresql://localhost:15432/postgres'
-    user = 'postgres'
-    password = 'h4sk3ll'
+    url = "jdbc:postgresql://localhost:15432/$dbusername"
+    user = "$dbusername"
+    password = "$dbpassword"
     connectRetries = 10
     createSchemas = false
     cleanDisabled = false
@@ -85,9 +91,9 @@ jooq {
                 logging = Logging.WARN
                 jdbc {
                     driver = 'org.postgresql.Driver'
-                    url = 'jdbc:postgresql://localhost:15432/postgres'
-                    user = 'postgres'
-                    password = 'h4sk3ll'
+                    url = "jdbc:postgresql://localhost:15432/$dbusername"
+                    user = "$dbusername"
+                    password = "$dbpassword"
                 }
                 generator {
                     name = 'org.jooq.codegen.DefaultGenerator'

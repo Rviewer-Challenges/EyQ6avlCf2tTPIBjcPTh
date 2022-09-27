@@ -7,6 +7,7 @@ import com.rebirth.mycode.domain.routines.FetchSnippetCodeSecureJooqadapt;
 import com.rebirth.mycode.domain.routines.InsertSnippetcode;
 import com.rebirth.mycode.domain.routines.UpsertSnippetcode;
 import com.rebirth.mycode.domain.tables.daos.SnippetCodeDao;
+import com.rebirth.mycode.domain.tables.daos.SnippetCodeTagDao;
 import com.rebirth.mycode.domain.tables.pojos.SnippetCode;
 import com.rebirth.mycode.domain.udt.pojos.SnippetCodePage;
 import com.rebirth.mycode.domain.udt.pojos.SnippetCodeSecure;
@@ -35,13 +36,15 @@ public class SnippetCodeServiceImpl implements SnippetCodeService {
     private final Configuration configuration;
     private final SnippetCodeMapper snippetCodeMapper;
     private final SnippetCodeDao snippetCodeDao;
+    private final SnippetCodeTagDao snippetCodeTagDao;
 
 
     @Autowired
-    public SnippetCodeServiceImpl(Configuration configuration, SnippetCodeMapper snippetCodeMapper, SnippetCodeDao snippetCodeDao) {
+    public SnippetCodeServiceImpl(Configuration configuration, SnippetCodeMapper snippetCodeMapper, SnippetCodeDao snippetCodeDao, SnippetCodeTagDao snippetCodeTagDao) {
         this.configuration = configuration;
         this.snippetCodeMapper = snippetCodeMapper;
         this.snippetCodeDao = snippetCodeDao;
+        this.snippetCodeTagDao = snippetCodeTagDao;
     }
 
     @Override
@@ -63,13 +66,30 @@ public class SnippetCodeServiceImpl implements SnippetCodeService {
 
     @Override
     public SnippetCodeSecure insert(SnippetCodeUpsert object) {
-        InsertSnippetcode insertSnippetcode = Routines.insertSnippetcode(this.configuration, "SYSTEM", object.getTitle(), object.getDescription(), object.getCode(), object.getProglangVersionUid(), object.getTagsUuids());
+
+        InsertSnippetcode insertSnippetcode = Routines.insertSnippetcode(this.configuration,
+                "SYSTEM",
+                object.getTitle(),
+                object.getDescription(),
+                object.getCode(),
+                object.getProglangUid(),
+                object.getProglangVersionUid(),
+                object.getTagsUuids()
+        );
         return this.snippetCodeMapper.insertSnippetcodeToSnippetCodeSecure(insertSnippetcode);
     }
 
     @Override
     public SnippetCodeSecure update(SnippetCodeUpsert object, UUID uuid) {
-        UpsertSnippetcode upsertSnippetcode = Routines.upsertSnippetcode(this.configuration, uuid, "SYSTEM", object.getDescription(), object.getCode(), object.getProglangVersionUid(), object.getTagsUuids());
+        UpsertSnippetcode upsertSnippetcode = Routines.upsertSnippetcode(this.configuration,
+                uuid,
+                "SYSTEM",
+                object.getDescription(),
+                object.getCode(),
+                object.getProglangUid(),
+                object.getProglangVersionUid(),
+                object.getTagsUuids()
+        );
         return this.snippetCodeMapper.upsertSnippetcodeToSnippetCodeSecure(upsertSnippetcode);
     }
 
